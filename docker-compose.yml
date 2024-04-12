@@ -1,0 +1,47 @@
+version: "3"
+services:
+  odoo:
+    build: .
+    image: img_odoo_16
+    container_name: odoo_v16
+    depends_on:
+      - db
+    volumes:
+      #- "data-odoo-16:/filestore"
+      - "./src:/opt/odoo"
+    environment:
+      - ODOO_DB_USER=odoo
+      - ODOO_DB_PASSWORD=odoo
+      - ODOO_DB_HOST=db
+      - ODOO_ADMIN_PASSWORD=admin
+    ports:
+      - "8016:8069"
+      - "8072:8069"
+    restart: always
+    #command: "/opt/odoo/odoo-bin -c /opt/odoo/.odoorc"
+    command: "/opt/odoo/odoo-bin -c /opt/odoo/.odoorc -d odoo_v16 -i base"
+    #command: "tail -f /dev/null"
+    networks:
+      - red-odoo16-db
+  db:
+    image: postgres:14
+    container_name: postgres_v14
+    environment:
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_DB=odoo_v16
+    volumes:
+      - "data-db-16:/var/lib/postgresql/data"
+      #- "./db_backup/odoo_v16.sql:/home/db_backup/odoo_v16.sql"
+    ports:
+      - "5432:5432"
+    restart: always
+    networks:
+      - red-odoo16-db
+
+networks:
+  red-odoo16-db:
+
+volumes:
+  data-odoo-16:
+  data-db-16:
