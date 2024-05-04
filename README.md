@@ -30,7 +30,6 @@ Con esto podremos levantar nuestra instancia de Odoo 16 en Docker.
 
 ---
 
-<div align="center">
-  ¡Gracias por visitar mi repositorio! 🚀<br>
-  No olvides suscribirte a mi <a href="https://www.youtube.com/channel/UCEnZOVwwMt-entEufOlmL6g" target="_blank">canal de YouTube</a> para más contenido. 📺
-</div>
+¡Gracias por visitar mi repositorio! 🚀<br>
+No olvides suscribirte a mi [canal de YouTube](https://www.youtube.com/channel/UCEnZOVwwMt-entEufOlmL6g){:target="\_blank" rel="noopener noreferrer"} para más contenido. 📺
+Regálame una ⭐️ al repositorio si te fue útil.
