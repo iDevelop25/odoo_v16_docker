@@ -1,133 +1,75 @@
-FROM ubuntu:20.04
-LABEL Creator: "Johannes Moreno"
+# Uso de una imagen base de Ubuntu 22.04
+FROM ubuntu:22.04
 
-RUN apt-get update \
-    && apt-get upgrade -y
+# Metadatos del creador
+LABEL Creator="Johannes Moreno"
 
-RUN apt-get install -y \
-    openssh-server fail2ban
+# Evitar interacciones durante la instalación de paquetes
+ENV DEBIAN_FRONTEND=noninteractive
 
-#RUN adduser --system --home=/opt/odoo --group odoo
-RUN adduser --disabled-password --gecos "Odoo" odoo
-
-RUN apt-get install -y \
-    python3-pip
-
-RUN apt-get update \
-    && \
-    apt-get install -y npm \
-    && \
-    npm install -g less less-plugin-clean-css \
-    && \
-	apt-get install -y node-less
-	
-RUN apt-get update \
-    && \
-    apt-get install -y \
-    nano
-
-RUN mkdir /opt/odoo
-
-WORKDIR /opt/odoo
-
-COPY src/requirements.txt .
-
-RUN pip3 install --no-cache-dir -r requirements.txt
-RUN apt-get update \
-    && \
-    apt-get install -y \
+# Actualizar el índice de paquetes e instalar dependencias
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+    openssh-server \
+    fail2ban \
+    nano \
+    wget \
+    gdebi-core \
+    git \
+    npm \
     python3-dev \
-    python3-pip \
     libxml2-dev \
-    libxslt1-dev \
+    libxslt-dev \
     libevent-dev \
     libsasl2-dev \
     libldap2-dev \
     libpq-dev \
     libjpeg-dev \
     poppler-utils \
-    node-less \
-    node-clean-css
+    unoconv \
+    default-jre \
+    libreoffice \
+    libreoffice-script-provider-python \
+    postgresql-client \
+    wkhtmltopdf \
+    tzdata  # Instala tzdata para configurar la zona horaria
 
-RUN apt-get install -y wget gdebi-core
+# Configura la zona horaria de Colombia
+RUN ln -fs /usr/share/zoneinfo/America/Bogota /etc/localtime && \
+    dpkg-reconfigure --frontend noninteractive tzdata
 
-RUN pip3 install lxml_html_clean
+# Instalar paquetes a través de pip sin caché interactivo
+RUN apt-get install -y python3-pip && \
+    pip3 install --no-cache-dir \
+    ptvsd \
+    lxml-html-clean \
+    libsass \
+    phonenumbers
 
+# Copiar archivo de requisitos y renombrarlo
+COPY .requirements /opt/odoo/src/requirements.txt
 
-RUN pip3 install libsass==0.20.1
+# Instalar los requisitos de Odoo
+RUN pip3 install --no-cache-dir -r /opt/odoo/src/requirements.txt
 
-#RUN apt-get -f install -y
+# Configurar usuario Odoo
+RUN adduser --disabled-password --gecos "Odoo" odoo && \
+    mkdir -p /opt/odoo && \
+    chown -R odoo:odoo /opt/odoo
 
-RUN apt install python3-daemonize
+# Copiar archivo de configuración de Odoo al directorio src/
+COPY .odoorc /opt/odoo/src/
 
-RUN pip3 install phonenumbers
-
-RUN apt-get install git -y
-
-RUN python3 -m pip install --upgrade pip
-
-
-RUN apt-get install -y unoconv
-
-RUN pip3 install pandas
-
-RUN pip install pylint --no-cache-dir
-RUN pip install zeep --no-cache-dir
-RUN pip install workalendar --no-cache-dir
-RUN pip install erppeek --no-cache-dir
-RUN pip install ics==0.5 --no-cache-dir	 
-RUN pip install DateTime --no-cache-dir
-RUN pip install ZODB --no-cache-dir
-RUN pip install unoconv --no-cache-dir
-RUN pip install appy
-RUN pip install treepoem --no-cache-dir
-RUN pip3 install pyPDF3 --no-cache-dir
-RUN pip3 install numpy --no-cache-dir
-RUN pip install Unidecode
-RUN pip install py-moneyed
-RUN pip install PyPDF2
-RUN pip install passlib
-RUN pip install Werkzeug
-RUN pip install decorator
-RUN pip install psutil
-RUN pip install jinja2
-RUN pip install reportlab
-RUN pip install polib==1.1.0
-RUN pip3 install pyopenssl==20.0.1
-RUN pip3 install cryptography==3.4.8
-
-RUN apt-get install default-jre -y
-
-RUN apt-get install libreoffice libreoffice-script-provider-python -y
-RUN echo '#!/bin/sh' | tee /etc/init.d/office
-RUN echo '/usr/bin/libreoffice --headless --accept="socket,host=localhost,port=8100,tcpNoDelay=1;urp;"&' | tee -a /etc/init.d/office
-RUN chmod +x /etc/init.d/office
-RUN update-rc.d office defaults
-RUN /etc/init.d/office
-
-RUN apt install unoconv -y
-
-RUN wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb
-
-RUN apt install -y ./wkhtmltox_0.12.5-1.bionic_amd64.deb
-
-RUN apt-get update
-
-RUN apt-get install -y postgresql-client
-
-RUN pip install psycopg2-binary
-
-# Asegúrate de configurar el directorio de trabajo correctamente
+# Configurar directorio de trabajo
 WORKDIR /opt/odoo
 
-# Instalar el paquete python3-ldap
-RUN apt-get install -y python3-ldap
+# Configurar LibreOffice como servicio
+RUN echo '#!/bin/bash' > /etc/init.d/office && \
+    echo '/usr/bin/libreoffice --headless --accept="socket,host=localhost,port=8100,tcpNoDelay=1;urp;" &' >> /etc/init.d/office && \
+    chmod +x /etc/init.d/office && \
+    update-rc.d office defaults && \
+    service office start
 
-
-
-
-# Copia tu archivo .odoorc al directorio /opt/odoo (asegúrate de que el archivo .odoorc esté presente)
-COPY .odoorc /opt/odoo/.odoorc
-
-# CMD se utiliza para proporcionar comandos predeterminados para un contenedor en ejecución
-CMD ["/opt/odoo/odoo-bin", "-c", "/opt/odoo/.odoorc"]
+# CMD predeterminado para ejecutar Odoo
+CMD ["/usr/local/bin/odoo-bin", "-c", "/opt/odoo/.odoorc"]

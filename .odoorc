@@ -1,8 +1,8 @@
 [options]
-addons_path = /opt/odoo/odoo/addons,/opt/odoo/addons
+addons_path = /opt/odoo/odoo/addons,/opt/odoo/addons,/opt/odoo/custom-addons
 admin_passwd = wuhg-u55u-ubd7
 csv_internal_sep = ,
-data_dir = /
+data_dir = /filestore
 db_host = db
 db_maxconn = 64
 #db_name = False
@@ -15,6 +15,7 @@ db_user = odoo
 dbfilter =
 #dbfilter = ^odoo_v16$
 demo = {}
+debug_mode = True
 email_from = False
 geoip_database = /usr/share/GeoIP/GeoLite2-City.mmdb
 http_enable = True

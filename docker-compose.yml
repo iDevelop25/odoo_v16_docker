@@ -1,4 +1,3 @@
-version: "3"
 services:
   odoo:
     build: .
@@ -7,7 +6,7 @@ services:
     depends_on:
       - db
     volumes:
-      #- "data-odoo-16:/filestore"
+      - "./data-odoo-16/filestore/:/filestore/"
       - "./src:/opt/odoo"
     environment:
       - ODOO_DB_USER=odoo
@@ -18,8 +17,9 @@ services:
       - "8016:8069"
       - "8072:8069"
     restart: always
-    #command: "/opt/odoo/odoo-bin -c /opt/odoo/.odoorc"
+    #command: "/opt/odoo/odoo-bin -c /opt/odoo/.odoorc -d odoo_v16"
     command: "/opt/odoo/odoo-bin -c /opt/odoo/.odoorc -d odoo_v16 -i base"
+    #command: "/opt/odoo/odoo-bin -c /opt/odoo/.odoorc -d odoo_v16 -i base --dev mode --debugger-port 5678"
     #command: "tail -f /dev/null"
     networks:
       - red-odoo16-db
@@ -32,9 +32,9 @@ services:
       - POSTGRES_DB=odoo_v16
     volumes:
       - "data-db-16:/var/lib/postgresql/data"
-      #- "./db_backup/odoo_v16.sql:/home/db_backup/odoo_v16.sql"
+      - "./data-odoo-16/dump.sql:/backupdb/"
     ports:
-      - "5432:5432"
+      - "5436:5432"
     restart: always
     networks:
       - red-odoo16-db
