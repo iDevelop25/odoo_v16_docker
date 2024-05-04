@@ -34,7 +34,7 @@ services:
       - "data-db-16:/var/lib/postgresql/data"
       - "./data-odoo-16/dump.sql:/backupdb/"
     ports:
-      - "5436:5432"
+      - "5416:5432"
     restart: always
     networks:
       - red-odoo16-db
