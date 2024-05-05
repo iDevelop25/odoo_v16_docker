@@ -17,8 +17,12 @@
 
 Vamos a clonar primero el repositorio que he creado configurado con todos los requirements necesarios.
 
-Ejecutamos:
-`git clone https://github.com/odoo/odoo.git --branch 16.0 --depth 1 --single-branch .`
+Dentro del directorio donde vayan a trabajar vamos a ejecutar:
+`git clone https://github.com/iDevelop25/odoo_v16_docker.git`
+
+## Clonando codigo fuente de Odoo 16
+
+Una vez clonado el repositorio odoo_v16_docker vamos a entrar a nuestro proyecto con `cd odoo_v16_docker` , luego de estar en la raiz del proyecto; creamos una carpeta llamada `src` entramos a `src` con `cd src` y unavez en src ejecutamos `git clone https://github.com/odoo/odoo.git --branch 16.0 --depth 1 --single-branch .`
 
 ## Construyendo la Imagen Base
 
